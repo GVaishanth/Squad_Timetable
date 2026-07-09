@@ -49,7 +49,7 @@ Theory slots run for 50 minutes. Lab slots run in 2-hour paired blocks. The "Non
 
 ## How to Use
 
-1. Download `vit_timetable_final.html`
+1. Download `index.html`
 2. Open it in any browser on your phone or PC
 3. No setup, no installation, no network needed
 
