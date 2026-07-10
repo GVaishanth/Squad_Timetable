@@ -73,7 +73,110 @@ body {
 .badge-lunch   { background: #7d4e00; color: #ffc97e; }
 .badge-free    { background: #1a3a5c; color: #7ec8ff; }
 .badge-weekend { background: #3a2d5c; color: #c8b0ff; }
-.profile-next  { font-size: 0.72rem; color: #aaa; line-height: 1.6; }
+
+/* ── IN-CLASS bubble ── */
+.class-bubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #6e1e1e, #3d0a0a);
+  border: 1px solid rgba(255,100,100,0.35);
+  border-radius: 10px;
+  padding: 7px 10px;
+  margin-bottom: 7px;
+  text-align: left;
+}
+.class-bubble-icon { font-size: 1rem; flex-shrink: 0; }
+.class-bubble-text { flex: 1; min-width: 0; }
+.class-bubble-label {
+  font-size: 0.7rem;
+  color: #ffa6a6;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.class-bubble-room {
+  display: inline-block;
+  background: rgba(255,80,80,0.25);
+  border: 1px solid rgba(255,100,100,0.5);
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 0.8px;
+  margin-top: 2px;
+}
+.class-bubble-name {
+  font-size: 0.62rem;
+  color: #cc8888;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── NEXT-CLASS bubble ── */
+.next-bubble {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #0f172a;
+  border: 1px solid #2d3561;
+  border-radius: 10px;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+  text-align: left;
+}
+.next-bubble-icon { font-size: 0.9rem; flex-shrink: 0; }
+.next-bubble-text { flex: 1; min-width: 0; }
+.next-bubble-label {
+  font-size: 0.62rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.next-bubble-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+.next-bubble-time {
+  font-size: 0.78rem;
+  font-weight: bold;
+  color: #fff;
+}
+.next-bubble-room {
+  display: inline-block;
+  background: rgba(100,130,200,0.2);
+  border: 1px solid rgba(100,130,200,0.4);
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #7eb8ff;
+  letter-spacing: 0.6px;
+}
+
+/* ── FREE-AT bubble (shown when in class, replaces next-class) ── */
+.free-bubble {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #0a1a0f;
+  border: 1px solid #1a4a28;
+  border-radius: 10px;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+}
+.free-bubble-label { font-size: 0.62rem; color: #4a8a5a; text-transform: uppercase; letter-spacing: 0.4px; }
+.free-bubble-time  { font-size: 0.78rem; font-weight: bold; color: #6effa6; margin-top: 2px; }
+
+/* ── SIMPLE status line (lunch, weekend, etc.) ── */
+.profile-next  { font-size: 0.72rem; color: #aaa; line-height: 1.6; margin-bottom: 4px; }
 .profile-next strong { color: #fff; }
 
 /* LEGEND */
@@ -91,7 +194,6 @@ body {
 
 /* TIMETABLES */
 .timetables-section { display:flex; flex-direction:column; gap:28px; }
-
 .tt-block {
   background: #16213e;
   border-radius: 12px;
@@ -108,7 +210,80 @@ body {
 }
 .tt-header-emoji { font-size: 1.5rem; }
 .tt-header-name  { font-size: 1.1rem; font-weight: bold; flex:1; }
-.tt-wrap { overflow-x: auto; padding: 12px; }
+
+/* Mobile scroll fix: isolate horizontal scroll from vertical page scroll */
+.tt-wrap {
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 12px;
+  /* Allow horizontal drag on touch without fighting page scroll */
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  position: relative;
+}
+/* Subtle scroll hint on mobile */
+@media(max-width:768px) {
+  .tt-wrap::after {
+    content: '← scroll →';
+    display: block;
+    text-align: center;
+    font-size: 0.6rem;
+    color: #2d3561;
+    padding-top: 4px;
+    letter-spacing: 1px;
+  }
+}
+
+/* TIME NEEDLE */
+.table-container {
+  position: relative;
+  display: inline-block;
+  min-width: 100%;
+}
+.time-needle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom,
+    rgba(255,255,255,0.50) 0%,
+    rgba(255,255,255,0.25) 40%,
+    rgba(255,255,255,0.08) 80%,
+    rgba(255,255,255,0.50) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+  transform: translateX(-50%);
+  transition: left 0.9s linear;
+}
+/* Bright glowing dot at the top */
+.time-needle::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px 3px rgba(255,255,255,0.85),
+              0 0 16px 4px rgba(200,220,255,0.5);
+}
+/* Bright glowing dot at the bottom */
+.time-needle::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px 3px rgba(255,255,255,0.85),
+              0 0 16px 4px rgba(200,220,255,0.5);
+}
 
 /* TABLE */
 table.ffcs {
@@ -117,75 +292,45 @@ table.ffcs {
   min-width: 900px;
   font-size: 0.68rem;
 }
-table.ffcs th,
-table.ffcs td {
+table.ffcs th, table.ffcs td {
   border: 1px solid #2d3561;
-  padding: 5px 4px;
+  padding: 4px 3px;
   text-align: center;
   vertical-align: middle;
   white-space: nowrap;
 }
+.hdr-main     { background: #0f172a; color: #94a3b8; font-weight:bold; font-size:0.62rem; }
+.hdr-sub      { background: #1e293b; color: #64748b; font-size:0.58rem; font-style:italic; }
+.hdr-am       { background: #1e3a5f; color: #7eb8ff; }
+.hdr-pm       { background: #1f2d1e; color: #7ec87e; }
+.hdr-lunch-hdr{ background: #4a3000; color: #ffc97e; font-weight:bold; }
+.hdr-none     { background: #111827; color: #2d3561; }
 
-/* Header rows */
-.hdr-main        { background: #0f172a; color: #94a3b8; font-weight:bold; font-size:0.65rem; }
-.hdr-sub         { background: #1e293b; color: #64748b; font-size:0.6rem; font-style:italic; }
-.hdr-am          { background: #1e3a5f; color: #7eb8ff; }
-.hdr-pm          { background: #1f2d1e; color: #7ec87e; }
-.hdr-lunch-hdr   { background: #4a3000; color: #ffc97e; font-weight:bold; }
-.hdr-none        { background: #111827; color: #2d3561; }
-
-/* Day label column */
-td.row-label {
-  background: #1e293b;
-  color: #94a3b8;
-  font-weight: bold;
-  font-size: 0.68rem;
-  width: 42px; min-width: 42px;
-}
-td.row-label.today { background: #2d3a8a; color: #a0b4ff; }
-
-/* Lunch data cell */
+td.row-label { background:#1e293b; color:#94a3b8; font-weight:bold; font-size:0.68rem; width:42px; min-width:42px; }
+td.row-label.today { background:#2d3a8a; color:#a0b4ff; }
 td.lunch-cell {
-  background: #4a3000 !important;
-  color: #ffc97e !important;
-  font-weight: bold;
-  font-size: 0.7rem;
-  writing-mode: vertical-rl;
-  letter-spacing: 2px;
-  min-width: 28px; width: 28px;
+  background:#4a3000 !important; color:#ffc97e !important;
+  font-weight:bold; font-size:0.7rem;
+  writing-mode:vertical-rl; letter-spacing:2px;
+  min-width:28px; width:28px;
 }
-
-/* Gap/None data cell */
-td.gap-cell { background: #111827; color: #2d3561; width: 22px; min-width:22px; }
-
-/* Data cells */
-td.slot      { background: #0f172a; color: #2d3561; min-width: 58px; }
-td.slot-th   { background: #0d1f3a; color: #60a5fa; font-weight: bold; }
-td.slot-lab  { background: #131f0a; color: #a3e635; font-weight: bold; }
-td.slot-both { background: #101508; }
-.t-part      { color: #60a5fa; font-weight:bold; }
-.l-part      { color: #a3e635; font-weight:bold; }
-
-/* Current-slot overlays */
-td.cur-class {
-  background: #5c0a0a !important;
-  box-shadow: inset 0 0 0 2px #ff4444;
-}
-td.cur-class .t-part,
-td.cur-class .l-part,
-td.cur-class span { color: #fff !important; }
-
-td.cur-free {
-  background: #0a3a1a !important;
-  box-shadow: inset 0 0 0 2px #22c55e;
-}
+td.slot      { background:#0f172a; color:#2d3561; min-width:68px; max-width:100px; white-space:normal; }
+td.slot-th   { background:#0d1f3a; color:#60a5fa; font-weight:bold; }
+td.slot-lab  { background:#131f0a; color:#a3e635; font-weight:bold; }
+td.slot-both { background:#101508; }
+.t-part      { color:#60a5fa; font-weight:bold; }
+.l-part      { color:#a3e635; font-weight:bold; }
+.course-tag  { display:block; font-size:0.55rem; color:#94a3b8; margin-top:2px; white-space:normal; line-height:1.3; }
+td.cur-class { background:#5c0a0a !important; box-shadow:inset 0 0 0 2px #ff4444; }
+td.cur-class .t-part, td.cur-class .l-part, td.cur-class span { color:#fff !important; }
+td.cur-class .course-tag { color:#ffaaaa !important; }
+td.cur-free  { background:#0a3a1a !important; box-shadow:inset 0 0 0 2px #22c55e; }
 
 .footer-note { text-align:center; color:#333; font-size:0.7rem; margin-top:12px; padding-bottom:10px; }
 </style>
 </head>
 <body>
 <div class="container">
-
   <div class="header">
     <h1>🎓 Squad Timetable</h1>
     <div class="clock-box">
@@ -193,145 +338,162 @@ td.cur-free {
       <div class="date"  id="date">Loading…</div>
     </div>
   </div>
-
   <div class="legend">
     <span><span class="ld" style="background:#60a5fa"></span>Theory slot</span>
     <span><span class="ld" style="background:#a3e635"></span>Lab slot</span>
     <span><span class="ld" style="background:#5c0a0a;box-shadow:inset 0 0 0 2px #ff4444"></span>Current (class)</span>
     <span><span class="ld" style="background:#0a3a1a;box-shadow:inset 0 0 0 2px #22c55e"></span>Current (free)</span>
   </div>
-
   <div class="profiles-grid" id="profiles-grid"></div>
   <div class="timetables-section" id="timetables-section"></div>
-
   <div class="footer-note">Auto-updates every second · 100% offline · Mon–Fri</div>
 </div>
 
 <script>
-// ─── CONSTANTS ───────────────────────────────────────────────────────────────
-var DAYS = ['MON','TUE','WED','THU','FRI'];
+// ─── FFCS TIME MODEL ─────────────────────────────────────────────────────────
+// 13 display columns (0–12), col 6 = LUNCH.
+// Each column has TWO possible occupancy windows: theory time and lab time.
+// A person is "in class" at time T if they have a registered slot whose
+// theory-time OR lab-time window covers T.
+//
+// THEORY windows per column (50 min each):
+//  col 0: 08:00–08:50   col 7: 14:00–14:50
+//  col 1: 09:00–09:50   col 8: 15:00–15:50
+//  col 2: 10:00–10:50   col 9: 16:00–16:50
+//  col 3: 11:00–11:50   col10: 17:00–17:50
+//  col 4: 12:00–12:50   col11: 18:00–18:50
+//  col 5: (none)        col12: (none)
+//
+// LAB windows — pairs of cols share one 2-hr block:
+//  cols 0+1 → 08:00–09:40   cols 7+8  → 14:00–15:40
+//  cols 2+3 → 09:51–11:30   cols 9+10 → 15:51–17:30
+//  cols 4+5 → 11:40–13:20   cols11+12 → 17:40–19:20
 
-// 13 display columns (0-12). Col 6 = LUNCH only. No gap/dead columns.
-// Col 5 = "None" theory but has lab slots (L6/L12/L18/L24/L30)
-// Col 12 = "None" theory but has lab slots (L36/L42/L48/L54/L60)
+var DAYS = ['MON','TUE','WED','THU','FRI'];
 var COL_LUNCH = 6;
 
-// Column start/end times in minutes from midnight
-// Theory: cols 0-4 (AM), cols 7-11 (PM). Col 5 & 12 = no theory, lab only.
-// cols:  0    1    2    3    4    5    6(L) 7    8    9   10   11   12
-var COL_START = [480, 540, 600, 660, 720, 751, 780, 840, 900, 960,1020,1080,1131];
-var COL_END   = [530, 590, 650, 710, 770, 800, 840, 890, 950,1010,1070,1130,1200];
+// Theory slot start/end in minutes (null = no theory for that col)
+var TH_START = [480, 540, 600, 660, 720, null, null, 840, 900,  960, 1020, 1080, null];
+var TH_END   = [530, 590, 650, 710, 770, null, null, 890, 950, 1010, 1070, 1130, null];
 
-// Theory slot codes per day per column (null = no theory slot for that col)
+// Lab block start/end in minutes per column
+var LAB_START = [480, 480, 591, 591, 700, 700, null, 840,  840,  951,  951, 1060, 1060];
+var LAB_END   = [580, 580, 690, 690, 800, 800, null, 940,  940, 1050, 1050, 1160, 1160];
+
+// For "next class" display: the earliest a slot becomes active
+var COL_EARLIEST_START = [480, 540, 591, 660, 700, 700, 780, 840, 900, 951, 1020, 1060, 1060];
+
+// Theory slot codes per day per column
 var THEORY_SLOT = {
-  MON: ['A1', 'F1', 'D1',  'TB1', 'TG1',  null, null, 'A2', 'F2', 'D2',  'TB2', 'TG2',  null],
-  TUE: ['B1', 'G1', 'E1',  'TC1', 'TAA1', null, null, 'B2', 'G2', 'E2',  'TC2', 'TAA2', null],
-  WED: ['C1', 'A1', 'F1',  'V1',  'V2',   null, null, 'C2', 'A2', 'F2',  'TD2', 'TBB2', null],
-  THU: ['D1', 'B1', 'G1',  'TE1', 'TCC1', null, null, 'D2', 'B2', 'G2',  'TE2', 'TCC2', null],
-  FRI: ['E1', 'C1', 'TA1', 'TF1', 'TD1',  null, null, 'E2', 'C2', 'TA2', 'TF2', 'TDD2', null]
+  MON: ['A1','F1','D1','TB1','TG1', null,null,'A2','F2','D2','TB2','TG2', null],
+  TUE: ['B1','G1','E1','TC1','TAA1',null,null,'B2','G2','E2','TC2','TAA2',null],
+  WED: ['C1','A1','F1','V1','V2',   null,null,'C2','A2','F2','TD2','TBB2',null],
+  THU: ['D1','B1','G1','TE1','TCC1',null,null,'D2','B2','G2','TE2','TCC2',null],
+  FRI: ['E1','C1','TA1','TF1','TD1',null,null,'E2','C2','TA2','TF2','TDD2',null]
 };
 
-// Lab slot codes per day per column. Col 5 = L6/L12/L18/L24/L30. Col 12 = L36/L42/L48/L54/L60.
+// Lab slot codes per day per column
 var LAB_SLOT = {
-  MON: ['L1',  'L2',  'L3',  'L4',  'L5',  'L6',  null, 'L31', 'L32', 'L33', 'L34', 'L35', 'L36'],
-  TUE: ['L7',  'L8',  'L9',  'L10', 'L11', 'L12', null, 'L37', 'L38', 'L39', 'L40', 'L41', 'L42'],
-  WED: ['L13', 'L14', 'L15', 'L16', 'L17', 'L18', null, 'L43', 'L44', 'L45', 'L46', 'L47', 'L48'],
-  THU: ['L19', 'L20', 'L21', 'L22', 'L23', 'L24', null, 'L49', 'L50', 'L51', 'L52', 'L53', 'L54'],
-  FRI: ['L25', 'L26', 'L27', 'L28', 'L29', 'L30', null, 'L55', 'L56', 'L57', 'L58', 'L59', 'L60']
+  MON: ['L1','L2','L3','L4','L5','L6',  null,'L31','L32','L33','L34','L35','L36'],
+  TUE: ['L7','L8','L9','L10','L11','L12',null,'L37','L38','L39','L40','L41','L42'],
+  WED: ['L13','L14','L15','L16','L17','L18',null,'L43','L44','L45','L46','L47','L48'],
+  THU: ['L19','L20','L21','L22','L23','L24',null,'L49','L50','L51','L52','L53','L54'],
+  FRI: ['L25','L26','L27','L28','L29','L30',null,'L55','L56','L57','L58','L59','L60']
 };
 
 // ─── PEOPLE ──────────────────────────────────────────────────────────────────
-// registered[day].theory  = { slotCode: 'label' }
-// registered[day].lab     = { labCode:  'label' }
+// registered[day].theory = { slotCode: 'Course Name' }
+// registered[day].lab    = { labCode:  'Course Name' }
+// Slot data format: { name: 'Course Name', room: 'ROOMCODE' }
 var PEOPLE = [
   {
-    name: 'Playboy', emoji: '🐺', accent: '#e91e8c',
-    registered: {
-      MON: { theory: { A2:'BACSE202', F2:'BAMAT207', D2:'BASTS101', TB2:'BACSE203' },
-             lab:    { L5:'BACSE202', L6:'BACSE202' } },
-      TUE: { theory: { B2:'BACSE203', E2:'BACSE324', TC2:'BAHUM107', TAA2:'BAJAP101' },
-             lab:    { L7:'BACSE102', L8:'BACSE102', L9:'BAMAT207', L10:'BAMAT207' } },
-      WED: { theory: { C2:'BAHUM107', A2:'BACSE202', F2:'BAMAT207', TD2:'BASTS101' },
-             lab:    { L15:'BAJAP101', L16:'BAJAP101' } },
-      THU: { theory: { D2:'BASTS101', B2:'BACSE203', TE2:'BACSE324' },
-             lab:    { L19:'BACSE324', L20:'BACSE324', L21:'BACSE102', L22:'BACSE102' } },
-      FRI: { theory: { E2:'BACSE324', C2:'BAHUM107', TA2:'BACSE202', TF2:'BAMAT207' },
-             lab:    { L27:'BACSE203', L28:'BACSE203' } }
+    name:'Playboy', emoji:'🐺', accent:'#e91e8c',
+    registered:{
+      MON:{ theory:{ A2:{n:'BACSE202 - Data Structures',    r:'PRP472'}, F2:{n:'BAMAT207 - Prob & Stats',      r:'PRP275'}, D2:{n:'BASTS101 - Soft Skills',        r:'PRP575'}, TB2:{n:'BACSE203 - OOPS',              r:'PRP379'} },
+            lab:   { L5:{n:'BACSE202 - DS Lab',             r:'PRP347'}, L6:{n:'BACSE202 - DS Lab',            r:'PRP347'} } },
+      TUE:{ theory:{ B2:{n:'BACSE203 - OOPS',              r:'PRP379'}, E2:{n:'BACSE324 - Computer Networks',  r:'PRP372'}, TC2:{n:'BAHUM107 - English',           r:'SJT118'}, TAA2:{n:'BAJAP101 - Japanese',       r:'PRP238A'} },
+            lab:   { L7:{n:'BACSE102 - CS Fund Lab',        r:'PRP136'}, L8:{n:'BACSE102 - CS Fund Lab',       r:'PRP136'}, L9:{n:'BAMAT207 - Stats Lab',          r:'PRP446'}, L10:{n:'BAMAT207 - Stats Lab',       r:'PRP446'} } },
+      WED:{ theory:{ C2:{n:'BAHUM107 - English',            r:'SJT118'}, A2:{n:'BACSE202 - Data Structures',   r:'PRP472'}, F2:{n:'BAMAT207 - Prob & Stats',       r:'PRP275'}, TD2:{n:'BASTS101 - Soft Skills',     r:'PRP575'} },
+            lab:   { L15:{n:'BAJAP101 - Japanese Lab',      r:'SJT517'}, L16:{n:'BAJAP101 - Japanese Lab',     r:'SJT517'} } },
+      THU:{ theory:{ D2:{n:'BASTS101 - Soft Skills',        r:'PRP575'}, B2:{n:'BACSE203 - OOPS',              r:'PRP379'}, TE2:{n:'BACSE324 - Computer Networks', r:'PRP372'} },
+            lab:   { L19:{n:'BACSE324 - CN Lab',            r:'SJT515'}, L20:{n:'BACSE324 - CN Lab',           r:'SJT515'}, L21:{n:'BACSE102 - CS Fund Lab',       r:'PRP136'}, L22:{n:'BACSE102 - CS Fund Lab',    r:'PRP136'} } },
+      FRI:{ theory:{ E2:{n:'BACSE324 - Computer Networks',  r:'PRP372'}, C2:{n:'BAHUM107 - English',           r:'SJT118'}, TA2:{n:'BACSE202 - Data Structures',   r:'PRP472'}, TF2:{n:'BAMAT207 - Prob & Stats',   r:'PRP275'} },
+            lab:   { L27:{n:'BACSE203 - OOPS Lab',          r:'PRP136'}, L28:{n:'BACSE203 - OOPS Lab',         r:'PRP136'} } }
     }
   },
   {
-    name: 'Vanshu', emoji: '🐯', accent: '#1565c0',
-    registered: {
-      MON: { theory: { A1:'BACSE202', F1:'BAMAT207', D1:'BASTS101', TB1:'BACSE203' },
-             lab:    { L33:'BACSE102', L34:'BACSE102' } },
-      TUE: { theory: { B1:'BACSE203', E1:'BACSE324' },
-             lab:    { L39:'BACSE324', L40:'BACSE324', L41:'BACSE202', L42:'BACSE202' } },
-      WED: { theory: { A1:'BACSE202', F1:'BAMAT207' },
-             lab:    { L45:'BACSE102', L46:'BACSE102' } },
-      THU: { theory: { D1:'BASTS101', B1:'BACSE203', TE1:'BACSE324' },
-             lab:    { L49:'BACSE203', L50:'BACSE203' } },
-      FRI: { theory: { E1:'BACSE324', TA1:'BACSE202', TF1:'BAMAT207', TD1:'BASTS101' },
-             lab:    { L55:'BAMAT207', L56:'BAMAT207' } }
+    name:'Vanshu', emoji:'🐯', accent:'#1565c0',
+    registered:{
+      MON:{ theory:{ A1:{n:'BACSE202 - Data Structures',   r:'PRP378'}, F1:{n:'BAMAT207 - Prob & Stats',       r:'PRP267'}, D1:{n:'BASTS101 - Soft Skills',        r:'PRP670'}, TB1:{n:'BACSE203 - OOPS',           r:'PRP576'} },
+            lab:   { L33:{n:'BACSE102 - CS Fund Lab',       r:'PRP136'}, L34:{n:'BACSE102 - CS Fund Lab',      r:'PRP136'} } },
+      TUE:{ theory:{ B1:{n:'BACSE203 - OOPS',              r:'PRP576'}, E1:{n:'BACSE324 - Computer Networks',  r:'PRP465'} },
+            lab:   { L39:{n:'BACSE324 - CN Lab',            r:'SJT515'}, L40:{n:'BACSE324 - CN Lab',           r:'SJT515'}, L41:{n:'BACSE202 - DS Lab',            r:'PRP136'}, L42:{n:'BACSE202 - DS Lab',         r:'PRP136'} } },
+      WED:{ theory:{ A1:{n:'BACSE202 - Data Structures',   r:'PRP378'}, F1:{n:'BAMAT207 - Prob & Stats',       r:'PRP267'} },
+            lab:   { L45:{n:'BACSE102 - CS Fund Lab',       r:'PRP136'}, L46:{n:'BACSE102 - CS Fund Lab',      r:'PRP136'} } },
+      THU:{ theory:{ D1:{n:'BASTS101 - Soft Skills',        r:'PRP670'}, B1:{n:'BACSE203 - OOPS',              r:'PRP576'}, TE1:{n:'BACSE324 - Computer Networks', r:'PRP465'} },
+            lab:   { L49:{n:'BACSE203 - OOPS Lab',          r:'PRP352'}, L50:{n:'BACSE203 - OOPS Lab',         r:'PRP352'} } },
+      FRI:{ theory:{ E1:{n:'BACSE324 - Computer Networks',  r:'PRP465'}, TA1:{n:'BACSE202 - Data Structures',  r:'PRP378'}, TF1:{n:'BAMAT207 - Prob & Stats',      r:'PRP267'}, TD1:{n:'BASTS101 - Soft Skills',    r:'PRP670'} },
+            lab:   { L55:{n:'BAMAT207 - Stats Lab',         r:'PRP446'}, L56:{n:'BAMAT207 - Stats Lab',        r:'PRP446'} } }
     }
   },
   {
-    name: 'Ganjedi', emoji: '🌿', accent: '#2e7d32',
-    registered: {
-      MON: { theory: { F1:'BACSE203', TB1:'BACSE202', A2:'BACSE201' },
-             lab:    { L35:'BACSE102', L36:'BACSE102' } },
-      TUE: { theory: { B1:'BACSE202', E1:'BASTS101', TC2:'BAHUM107', TAA2:'BACSE201' },
-             lab:    { L37:'BACSE203', L38:'BACSE203' } },
-      WED: { theory: { F1:'BACSE203', C2:'BAHUM107', A2:'BACSE201' },
-             lab:    { L45:'BACSE102', L46:'BACSE102' } },
-      THU: { theory: { B1:'BACSE202', TE1:'BASTS101' },
-             lab:    { L51:'BACSE202', L52:'BACSE202' } },
-      FRI: { theory: { E1:'BASTS101', TF1:'BACSE203', C2:'BAHUM107', TA2:'BACSE201' },
-             lab:    {} }
+    name:'Ganjedi', emoji:'🌿', accent:'#2e7d32',
+    registered:{
+      MON:{ theory:{ F1:{n:'BACSE203 - OOPS',              r:'SJT825'}, TB1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, A2:{n:'BACSE201 - Discrete Maths',     r:'PRP332'} },
+            lab:   { L35:{n:'BACSE102 - CS Fund Lab',       r:'PRP347'}, L36:{n:'BACSE102 - CS Fund Lab',      r:'PRP347'} } },
+      TUE:{ theory:{ B1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, E1:{n:'BASTS101 - Soft Skills',        r:'SJT215'}, TC2:{n:'BAHUM107 - English',           r:'SJT118'}, TAA2:{n:'BACSE201 - Discrete Maths',r:'PRP332'} },
+            lab:   { L37:{n:'BACSE203 - OOPS Lab',          r:'SJTG18'}, L38:{n:'BACSE203 - OOPS Lab',         r:'SJTG18'} } },
+      WED:{ theory:{ F1:{n:'BACSE203 - OOPS',              r:'SJT825'}, C2:{n:'BAHUM107 - English',            r:'SJT118'}, A2:{n:'BACSE201 - Discrete Maths',     r:'PRP332'} },
+            lab:   { L45:{n:'BACSE102 - CS Fund Lab',       r:'PRP347'}, L46:{n:'BACSE102 - CS Fund Lab',      r:'PRP347'} } },
+      THU:{ theory:{ B1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, TE1:{n:'BASTS101 - Soft Skills',       r:'SJT215'} },
+            lab:   { L51:{n:'BACSE202 - DS Lab',            r:'SJT218'}, L52:{n:'BACSE202 - DS Lab',           r:'SJT218'} } },
+      FRI:{ theory:{ E1:{n:'BASTS101 - Soft Skills',        r:'SJT215'}, TF1:{n:'BACSE203 - OOPS',             r:'SJT825'}, C2:{n:'BAHUM107 - English',            r:'SJT118'}, TA2:{n:'BACSE201 - Discrete Maths', r:'PRP332'} },
+            lab:   {} }
     }
   },
   {
-    name: 'Ghaziabaddie', emoji: '🦁', accent: '#e65100',
-    registered: {
-      MON: { theory: { A1:'BACSE201', F1:'BAMAT207', TB1:'BACSE202', TG1:'BAHUM119' },
-             lab:    { L35:'BAMAT207', L36:'BAMAT207' } },
-      TUE: { theory: { B1:'BACSE202', G1:'BAHUM119', E1:'BASTS101', TAA1:'BACSE201' },
-             lab:    {} },
-      WED: { theory: { A1:'BACSE201', F1:'BAMAT207' },
-             lab:    {} },
-      THU: { theory: { B1:'BACSE202', G1:'BAHUM119', TE1:'BASTS101', TCC1:'BAESP101' },
-             lab:    { L49:'BACSE102', L50:'BACSE102', L51:'BACSE202', L52:'BACSE202' } },
-      FRI: { theory: { E1:'BASTS101', TA1:'BACSE201', TF1:'BAMAT207' },
-             lab:    { L55:'BACSE102', L56:'BACSE102', L57:'BAESP101', L58:'BAESP101' } }
+    name:'Ghaziabaddie', emoji:'🦁', accent:'#e65100',
+    registered:{
+      MON:{ theory:{ A1:{n:'BACSE201 - Discrete Maths',    r:'PRP333'}, F1:{n:'BAMAT207 - Prob & Stats',       r:'PRP568'}, TB1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, TG1:{n:'BAHUM119 - Hist & Phil Sci',r:'GDN122'} },
+            lab:   { L35:{n:'BAMAT207 - Stats Lab',         r:'PRP119'}, L36:{n:'BAMAT207 - Stats Lab',        r:'PRP119'} } },
+      TUE:{ theory:{ B1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, G1:{n:'BAHUM119 - Hist & Phil Sci',    r:'GDN122'}, E1:{n:'BASTS101 - Soft Skills',        r:'SJT224'}, TAA1:{n:'BACSE201 - Discrete Maths',r:'PRP333'} },
+            lab:   {} },
+      WED:{ theory:{ A1:{n:'BACSE201 - Discrete Maths',    r:'PRP333'}, F1:{n:'BAMAT207 - Prob & Stats',       r:'PRP568'} },
+            lab:   {} },
+      THU:{ theory:{ B1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, G1:{n:'BAHUM119 - Hist & Phil Sci',    r:'GDN122'}, TE1:{n:'BASTS101 - Soft Skills',       r:'SJT224'}, TCC1:{n:'BAESP101 - Spanish',       r:'SJT118'} },
+            lab:   { L49:{n:'BACSE102 - CS Fund Lab',       r:'SJT122'}, L50:{n:'BACSE102 - CS Fund Lab',      r:'SJT122'}, L51:{n:'BACSE202 - DS Lab',            r:'SJT218'}, L52:{n:'BACSE202 - DS Lab',         r:'SJT218'} } },
+      FRI:{ theory:{ E1:{n:'BASTS101 - Soft Skills',        r:'SJT224'}, TA1:{n:'BACSE201 - Discrete Maths',   r:'PRP333'}, TF1:{n:'BAMAT207 - Prob & Stats',      r:'PRP568'} },
+            lab:   { L55:{n:'BACSE102 - CS Fund Lab',       r:'SJT122'}, L56:{n:'BACSE102 - CS Fund Lab',      r:'SJT122'}, L57:{n:'BAESP101 - Spanish Lab',       r:'PRP555'}, L58:{n:'BAESP101 - Spanish Lab',    r:'PRP555'} } }
     }
   },
   {
-    name: 'Pontu', emoji: '🖤', accent: '#9e9e9e',
-    registered: {
-      MON: { theory: { A1:'BACSE201', F1:'BACSE203', TB1:'BACSE202', TG1:'BAMAT207' },
-             lab:    {} },
-      TUE: { theory: { B1:'BACSE202', G1:'BAMAT207', E1:'BASTS101', TC1:'BAHUM107', TAA1:'BACSE201' },
-             lab:    {} },
-      WED: { theory: { C1:'BAHUM107', A1:'BACSE201', F1:'BACSE203' },
-             lab:    { L43:'BACSE102', L44:'BACSE102', L45:'BAMAT207', L46:'BAMAT207', L47:'BACSE203', L48:'BACSE203' } },
-      THU: { theory: { B1:'BACSE202', G1:'BAMAT207', TE1:'BASTS101' },
-             lab:    { L51:'BACSE202', L52:'BACSE202' } },
-      FRI: { theory: { E1:'BASTS101', C1:'BAHUM107', TA1:'BACSE201', TF1:'BACSE203' },
-             lab:    { L55:'BACSE102', L56:'BACSE102' } }
+    name:'Pontu', emoji:'🖤', accent:'#9e9e9e',
+    registered:{
+      MON:{ theory:{ A1:{n:'BACSE201 - Discrete Maths',    r:'SJT126'}, F1:{n:'BACSE203 - OOPS',               r:'SJT824'}, TB1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, TG1:{n:'BAMAT207 - Prob & Stats',   r:'SJT522'} },
+            lab:   {} },
+      TUE:{ theory:{ B1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, G1:{n:'BAMAT207 - Prob & Stats',        r:'SJT522'}, E1:{n:'BASTS101 - Soft Skills',        r:'SJT221'}, TC1:{n:'BAHUM107 - English',        r:'PRP333'}, TAA1:{n:'BACSE201 - Discrete Maths',r:'SJT126'} },
+            lab:   {} },
+      WED:{ theory:{ C1:{n:'BAHUM107 - English',            r:'PRP333'}, A1:{n:'BACSE201 - Discrete Maths',     r:'SJT126'}, F1:{n:'BACSE203 - OOPS',               r:'SJT824'} },
+            lab:   { L43:{n:'BACSE102 - CS Fund Lab',       r:'SJT218'}, L44:{n:'BACSE102 - CS Fund Lab',      r:'SJT218'}, L45:{n:'BAMAT207 - Stats Lab',         r:'PRP446'}, L46:{n:'BAMAT207 - Stats Lab',      r:'PRP446'}, L47:{n:'BACSE203 - OOPS Lab',r:'SJT216'}, L48:{n:'BACSE203 - OOPS Lab',r:'SJT216'} } },
+      THU:{ theory:{ B1:{n:'BACSE202 - Data Structures',   r:'SJT125'}, G1:{n:'BAMAT207 - Prob & Stats',        r:'SJT522'}, TE1:{n:'BASTS101 - Soft Skills',       r:'SJT221'} },
+            lab:   { L51:{n:'BACSE202 - DS Lab',            r:'SJT218'}, L52:{n:'BACSE202 - DS Lab',           r:'SJT218'} } },
+      FRI:{ theory:{ E1:{n:'BASTS101 - Soft Skills',        r:'SJT221'}, C1:{n:'BAHUM107 - English',            r:'PRP333'}, TA1:{n:'BACSE201 - Discrete Maths',   r:'SJT126'}, TF1:{n:'BACSE203 - OOPS',           r:'SJT824'} },
+            lab:   { L55:{n:'BACSE102 - CS Fund Lab',       r:'SJT218'}, L56:{n:'BACSE102 - CS Fund Lab',      r:'SJT218'} } }
     }
   },
   {
-    name: 'Gambler', emoji: '🎰', accent: '#b71c1c',
-    registered: {
-      MON: { theory: { A1:'BAECE201', F1:'BAECE350', D1:'BAECE204', TB1:'BAECE203', TG1:'BAHUM111' },
-             lab:    { L31:'BAECE350', L32:'BAECE350', L35:'BAECE204', L36:'BAECE204' } },
-      TUE: { theory: { B1:'BAECE203', G1:'BAHUM111', E1:'BASTS101', TC1:'BAECE202', TAA1:'BAECE201' },
-             lab:    { L39:'BAECE203', L40:'BAECE203' } },
-      WED: { theory: { C1:'BAECE202', A1:'BAECE201', F1:'BAECE350' },
-             lab:    {} },
-      THU: { theory: { D1:'BAECE204', B1:'BAECE203', G1:'BAHUM111', TE1:'BASTS101', TCC1:'BAECE202' },
-             lab:    {} },
-      FRI: { theory: { E1:'BASTS101', C1:'BAECE202', TA1:'BAECE201', TF1:'BAECE350', TD1:'BAECE204' },
-             lab:    {} }
+    name:'Gambler', emoji:'🎰', accent:'#b71c1c',
+    registered:{
+      MON:{ theory:{ A1:{n:'BAECE201 - Circuit Theory',    r:'PRP427'}, F1:{n:'BAECE350 - VLSI Design',         r:'PRP632'}, D1:{n:'BAECE204 - Signals & Systems',  r:'PRP429'}, TB1:{n:'BAECE203 - Elec Devices',   r:'PRP425'}, TG1:{n:'BAHUM111 - Economics',r:'PRP568'} },
+            lab:   { L31:{n:'BAECE350 - VLSI Lab',         r:'PRP405'}, L32:{n:'BAECE350 - VLSI Lab',          r:'PRP405'}, L35:{n:'BAECE204 - Signals Lab',       r:'TT729'},  L36:{n:'BAECE204 - Signals Lab',    r:'TT729'} } },
+      TUE:{ theory:{ B1:{n:'BAECE203 - Elec Devices',      r:'PRP425'}, G1:{n:'BAHUM111 - Economics',           r:'PRP568'}, E1:{n:'BASTS101 - Soft Skills',        r:'PRP251'}, TC1:{n:'BAECE202 - Electromagnetics',r:'PRP424'}, TAA1:{n:'BAECE201 - Circuit Theory',r:'PRP427'} },
+            lab:   { L39:{n:'BAECE203 - Elec Devices Lab', r:'TT246'},  L40:{n:'BAECE203 - Elec Devices Lab',  r:'TT246'} } },
+      WED:{ theory:{ C1:{n:'BAECE202 - Electromagnetics',  r:'PRP424'}, A1:{n:'BAECE201 - Circuit Theory',      r:'PRP427'}, F1:{n:'BAECE350 - VLSI Design',        r:'PRP632'} },
+            lab:   {} },
+      THU:{ theory:{ D1:{n:'BAECE204 - Signals & Systems', r:'PRP429'}, B1:{n:'BAECE203 - Elec Devices',        r:'PRP425'}, G1:{n:'BAHUM111 - Economics',          r:'PRP568'}, TE1:{n:'BASTS101 - Soft Skills',    r:'PRP251'}, TCC1:{n:'BAECE202 - Electromagnetics',r:'PRP424'} },
+            lab:   {} },
+      FRI:{ theory:{ E1:{n:'BASTS101 - Soft Skills',        r:'PRP251'}, C1:{n:'BAECE202 - Electromagnetics',   r:'PRP424'}, TA1:{n:'BAECE201 - Circuit Theory',    r:'PRP427'}, TF1:{n:'BAECE350 - VLSI Design',    r:'PRP632'}, TD1:{n:'BAECE204 - Signals & Systems',r:'PRP429'} },
+            lab:   {} }
     }
   }
 ];
@@ -341,117 +503,304 @@ function nowMins() {
   var n = new Date();
   return n.getHours() * 60 + n.getMinutes();
 }
-
 function todayCode() {
   return ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date().getDay()];
 }
-
-function currentCol(m) {
-  if (m >= 780 && m < 840) return COL_LUNCH;
-  for (var c = 0; c < 13; c++) {
-    if (c === COL_LUNCH) continue;
-    if (m >= COL_START[c] && m < COL_END[c]) return c;
-  }
-  return -1;
-}
-
 function fmtTime(m) {
-  var h   = Math.floor(m / 60);
-  var min = m % 60;
+  var h = Math.floor(m / 60), min = m % 60;
   var ampm = h >= 12 ? 'PM' : 'AM';
-  var hh   = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+  var hh = h > 12 ? h - 12 : (h === 0 ? 12 : h);
   return hh + ':' + (min === 0 ? '00' : String(min).padStart(2,'0')) + ' ' + ampm;
 }
 
-function hasRegistered(person, day, col) {
-  if (DAYS.indexOf(day) === -1) return false;
-  var reg = person.registered[day];
-  var ts  = THEORY_SLOT[day][col];
-  var ls  = LAB_SLOT[day][col];
-  if (ts && reg.theory[ts]) return true;
-  if (ls && reg.lab[ls])    return true;
+// ─── CORE: is a person in class right now at a specific column? ───────────────
+// Returns true if the person has a registered slot in col c on day d
+// AND the current time falls within that slot's theory OR lab window.
+function colCoversTime(col, mins, hasTheory, hasLab) {
+  if (col === COL_LUNCH) return false;
+  if (hasTheory && TH_START[col] !== null) {
+    if (mins >= TH_START[col] && mins < TH_END[col]) return true;
+  }
+  if (hasLab && LAB_START[col] !== null) {
+    if (mins >= LAB_START[col] && mins < LAB_END[col]) return true;
+  }
   return false;
 }
 
-// Next registered slot AFTER the current one today (returns formatted time string or null)
-function nextClassTime(person, day, fromCol) {
-  if (DAYS.indexOf(day) === -1) return null;
-  for (var c = fromCol + 1; c < 13; c++) {
+// Helper: get slot value (object {n,r}) or null
+function slotVal(reg, type, code) {
+  if (!code) return null;
+  var v = reg[type][code];
+  return v ? v : null;
+}
+
+function hasRegistered(person, day, col) {
+  if (DAYS.indexOf(day) === -1 || col === COL_LUNCH) return false;
+  var reg = person.registered[day];
+  var ts = THEORY_SLOT[day][col];
+  var ls = LAB_SLOT[day][col];
+  return (ts && reg.theory[ts]) || (ls && reg.lab[ls]) ? true : false;
+}
+
+// Is this person in class right now?
+function isInClassNow(person, day, mins) {
+  if (DAYS.indexOf(day) === -1) return false;
+  var reg = person.registered[day];
+  for (var c = 0; c < 13; c++) {
     if (c === COL_LUNCH) continue;
-    if (hasRegistered(person, day, c)) return fmtTime(COL_START[c]);
+    var ts = THEORY_SLOT[day][c];
+    var ls = LAB_SLOT[day][c];
+    var hasTh = ts && reg.theory[ts] ? true : false;
+    var hasLb = ls && reg.lab[ls]    ? true : false;
+    if (colCoversTime(c, mins, hasTh, hasLb)) return true;
   }
-  // check subsequent days
-  var di = DAYS.indexOf(day);
-  for (var d = di + 1; d < DAYS.length; d++) {
-    for (var c2 = 0; c2 < 13; c2++) {
-      if (c2 === COL_LUNCH) continue;
-      if (hasRegistered(person, DAYS[d], c2)) return DAYS[d] + ' ' + fmtTime(COL_START[c2]);
+  return false;
+}
+
+// Returns { name, slot, room } of the current class, or null
+function currentCourse(person, day, mins) {
+  if (DAYS.indexOf(day) === -1) return null;
+  var reg = person.registered[day];
+  for (var c = 0; c < 13; c++) {
+    if (c === COL_LUNCH) continue;
+    var ts = THEORY_SLOT[day][c];
+    var ls = LAB_SLOT[day][c];
+    var thVal = ts ? reg.theory[ts] : null;
+    var lbVal = ls ? reg.lab[ls]    : null;
+    var hasTh = thVal ? true : false;
+    var hasLb = lbVal ? true : false;
+    if (colCoversTime(c, mins, hasTh, hasLb)) {
+      // Prefer the window that actually covers right now
+      if (hasTh && TH_START[c] !== null && mins >= TH_START[c] && mins < TH_END[c]) {
+        return { name: thVal.n, slot: ts, room: thVal.r };
+      }
+      if (hasLb && LAB_START[c] !== null && mins >= LAB_START[c] && mins < LAB_END[c]) {
+        return { name: lbVal.n, slot: ls, room: lbVal.r };
+      }
+      // fallback: return whichever is registered
+      if (hasTh) return { name: thVal.n, slot: ts, room: thVal.r };
+      if (hasLb) return { name: lbVal.n, slot: ls, room: lbVal.r };
     }
   }
   return null;
 }
 
-// End time of the current class (or end of class run)
-function classEndsAt(person, day, startCol) {
-  var endCol = startCol;
-  for (var c = startCol; c < 13; c++) {
-    if (c === COL_LUNCH) break;
-    if (hasRegistered(person, day, c)) endCol = c;
-    else break;
+// When does the current class block end?
+function classEndsAt(person, day, mins) {
+  if (DAYS.indexOf(day) === -1) return null;
+  var reg = person.registered[day];
+  var latestEnd = 0;
+  for (var c = 0; c < 13; c++) {
+    if (c === COL_LUNCH) continue;
+    var ts = THEORY_SLOT[day][c]; var ls = LAB_SLOT[day][c];
+    var hasTh = ts && reg.theory[ts] ? true : false;
+    var hasLb = ls && reg.lab[ls]    ? true : false;
+    if (colCoversTime(c, mins, hasTh, hasLb)) {
+      if (hasTh && TH_END[c] !== null)  latestEnd = Math.max(latestEnd, TH_END[c]);
+      if (hasLb && LAB_END[c] !== null) latestEnd = Math.max(latestEnd, LAB_END[c]);
+    }
   }
-  return fmtTime(COL_END[endCol]);
+  var checkMins = latestEnd; var extended = true;
+  while (extended) {
+    extended = false;
+    for (var c2 = 0; c2 < 13; c2++) {
+      if (c2 === COL_LUNCH) continue;
+      var ts2 = THEORY_SLOT[day][c2]; var ls2 = LAB_SLOT[day][c2];
+      var hasTh2 = ts2 && reg.theory[ts2] ? true : false;
+      var hasLb2 = ls2 && reg.lab[ls2]    ? true : false;
+      if (colCoversTime(c2, checkMins, hasTh2, hasLb2)) {
+        var newEnd = 0;
+        if (hasTh2 && TH_END[c2])  newEnd = Math.max(newEnd, TH_END[c2]);
+        if (hasLb2 && LAB_END[c2]) newEnd = Math.max(newEnd, LAB_END[c2]);
+        if (newEnd > latestEnd) { latestEnd = newEnd; checkMins = latestEnd; extended = true; }
+      }
+    }
+  }
+  return latestEnd > 0 ? fmtTime(latestEnd) : null;
+}
+
+// When is the next class?
+// Returns { time:'9:00 AM', room:'PRP472', name:'BACSE202...' } or null
+function nextClassAt(person, day, mins) {
+  if (DAYS.indexOf(day) === -1) return null;
+
+  // Search today first, then subsequent days
+  var searchDays = [];
+  searchDays.push({ dayCode: day, reg: person.registered[day], prefix: '' });
+  var di = DAYS.indexOf(day);
+  for (var d = di + 1; d < DAYS.length; d++) {
+    searchDays.push({ dayCode: DAYS[d], reg: person.registered[DAYS[d]], prefix: DAYS[d] + ' ' });
+  }
+
+  for (var sd = 0; sd < searchDays.length; sd++) {
+    var dayCode = searchDays[sd].dayCode;
+    var reg     = searchDays[sd].reg;
+    var prefix  = searchDays[sd].prefix;
+    var minTime = (sd === 0) ? mins : -1; // only filter by mins on today
+
+    // Collect all upcoming slots with their start time + room
+    var candidates = [];
+    for (var c = 0; c < 13; c++) {
+      if (c === COL_LUNCH) continue;
+      var ts = THEORY_SLOT[dayCode][c];
+      var ls = LAB_SLOT[dayCode][c];
+      var thVal = ts ? reg.theory[ts] : null;
+      var lbVal = ls ? reg.lab[ls]    : null;
+
+      // Theory slot
+      if (thVal && TH_START[c] !== null && TH_START[c] > minTime) {
+        candidates.push({ t: TH_START[c], room: thVal.r, name: thVal.n, prefix: prefix });
+      }
+      // Lab slot
+      if (lbVal && LAB_START[c] !== null && LAB_START[c] > minTime) {
+        candidates.push({ t: LAB_START[c], room: lbVal.r, name: lbVal.n, prefix: prefix });
+      }
+    }
+
+    if (candidates.length > 0) {
+      candidates.sort(function(a, b) { return a.t - b.t; });
+      var best = candidates[0];
+      return { time: best.prefix + fmtTime(best.t), room: best.room, name: best.name };
+    }
+  }
+  return null;
 }
 
 // ─── STATUS ───────────────────────────────────────────────────────────────────
-function statusOf(person, dayCode, col) {
-  if (DAYS.indexOf(dayCode) === -1) {
-    return { badge: 'badge-weekend', label: '🏖️ Weekend', nextLabel: '', nextVal: 'Enjoy!' };
+function statusOf(person, day, mins) {
+  if (DAYS.indexOf(day) === -1) {
+    return { badge:'badge-weekend', label:'🏖️ Weekend', nextLabel:'', nextVal:'Enjoy!', course:null, nextClass:null };
   }
-  var m = nowMins();
-  if (col === -1) {
-    if (m < COL_START[0]) {
-      return { badge: 'badge-free', label: '😴 Before class', nextLabel: 'Classes start at', nextVal: '8:00 AM' };
-    }
-    if (m >= COL_END[11]) {
-      return { badge: 'badge-in', label: '🏠 In Room', nextLabel: 'Done for today!', nextVal: '' };
-    }
-    var nxt = nextClassTime(person, dayCode, col);
-    return { badge: 'badge-free', label: '🚶 Between slots', nextLabel: 'Next class:', nextVal: nxt || 'None today' };
+  if (mins < 480) {
+    var nc0 = nextClassAt(person, day, mins);
+    return { badge:'badge-free', label:'😴 Before class', nextLabel:'Classes start at', nextVal:'8:00 AM', course:null, nextClass:nc0 };
   }
-  if (col === COL_LUNCH) {
-    return { badge: 'badge-lunch', label: '🍽️ Lunch', nextLabel: 'Back at', nextVal: '2:00 PM' };
+  if (mins >= 1160) {
+    return { badge:'badge-in', label:'🏠 In Room', nextLabel:'Done for today!', nextVal:'', course:null, nextClass:null };
   }
-  if (hasRegistered(person, dayCode, col)) {
-    var ends = classEndsAt(person, dayCode, col);
-    return { badge: 'badge-out', label: '📚 In Class', nextLabel: 'Free at', nextVal: ends };
+  if (mins >= 780 && mins < 840) {
+    var nc1 = nextClassAt(person, day, mins);
+    return { badge:'badge-lunch', label:'🍽️ Lunch', nextLabel:'Back at', nextVal:'2:00 PM', course:null, nextClass:nc1 };
   }
-  var nxt3 = nextClassTime(person, dayCode, col);
-  return { badge: 'badge-in', label: '🏠 In Room', nextLabel: 'Next class:', nextVal: nxt3 || 'No more today' };
+  if (isInClassNow(person, day, mins)) {
+    var ends = classEndsAt(person, day, mins);
+    var cc   = currentCourse(person, day, mins);
+    return { badge:'badge-out', label:'📚 In Class', nextLabel:'Free at', nextVal:ends || '—', course:cc, nextClass:null };
+  }
+  var nxt = nextClassAt(person, day, mins);
+  return { badge:'badge-in', label:'🏠 In Room', nextLabel:'Next class:', nextVal: nxt ? nxt.time : 'No more today', course:null, nextClass:nxt };
 }
 
-// ─── BUILD PROFILE CARD HTML ──────────────────────────────────────────────────
-function buildProfileCard(person, dayCode, col) {
-  var s = statusOf(person, dayCode, col);
-  var nextHTML = s.nextLabel
-    ? '<span>' + s.nextLabel + '</span><br><strong>' + s.nextVal + '</strong>'
-    : '<strong>' + s.nextVal + '</strong>';
-  return '<div class="profile-card" style="--accent:' + person.accent + '">'
+// ─── HIGHLIGHT: which column is "current" for table display ──────────────────
+// (used only for cell highlighting, not for status logic)
+function currentDisplayCol(mins) {
+  if (mins >= 780 && mins < 840) return COL_LUNCH;
+  // Find col whose theory OR lab window covers mins
+  for (var c = 0; c < 13; c++) {
+    if (c === COL_LUNCH) continue;
+    var inTh  = TH_START[c]  !== null && mins >= TH_START[c]  && mins < TH_END[c];
+    var inLab = LAB_START[c] !== null && mins >= LAB_START[c] && mins < LAB_END[c];
+    if (inTh || inLab) return c;
+  }
+  return -1;
+}
+
+// ─── BUILD PROFILE CARD ───────────────────────────────────────────────────────
+function buildProfileCard(person, day, mins) {
+  var s = statusOf(person, day, mins);
+  var html = '<div class="profile-card" style="--accent:' + person.accent + '">'
     + '<div class="profile-emoji">' + person.emoji + '</div>'
-    + '<div class="profile-name">'  + person.name  + '</div>'
-    + '<div class="profile-badge '  + s.badge + '">' + s.label + '</div>'
-    + '<div class="profile-next">'  + nextHTML + '</div>'
-    + '</div>';
+    + '<div class="profile-name">' + person.name + '</div>';
+
+  if (s.course) {
+    // ── IN CLASS ──
+    // Main bubble: 📚 In Class + room pill
+    html += '<div class="class-bubble">'
+      + '<span class="class-bubble-icon">📚</span>'
+      + '<div class="class-bubble-text">'
+      + '<div class="class-bubble-label">In Class</div>'
+      + '<div><span class="class-bubble-room">' + s.course.room + '</span></div>'
+      + '<div class="class-bubble-name">' + s.course.name + '</div>'
+      + '</div></div>';
+    // Free-at bubble
+    html += '<div class="free-bubble">'
+      + '<span style="font-size:0.9rem">🕐</span>'
+      + '<div><div class="free-bubble-label">Free at</div>'
+      + '<div class="free-bubble-time">' + (s.nextVal || '—') + '</div>'
+      + '</div></div>';
+
+  } else if (s.badge === 'badge-lunch') {
+    // ── LUNCH ──
+    html += '<div class="profile-badge badge-lunch">🍽️ Lunch</div>';
+    if (s.nextClass) {
+      html += '<div class="next-bubble">'
+        + '<span class="next-bubble-icon">⏭️</span>'
+        + '<div class="next-bubble-text">'
+        + '<div class="next-bubble-label">Next class</div>'
+        + '<div class="next-bubble-row">'
+        + '<span class="next-bubble-time">' + s.nextClass.time + '</span>'
+        + '<span class="next-bubble-room">' + s.nextClass.room + '</span>'
+        + '</div>'
+        + '<div class="class-bubble-name">' + s.nextClass.name + '</div>'
+        + '</div></div>';
+    } else {
+      html += '<div class="profile-next"><strong>Back at 2:00 PM</strong></div>';
+    }
+
+  } else if (s.badge === 'badge-in' || s.badge === 'badge-free') {
+    // ── IN ROOM / FREE ──
+    html += '<div class="profile-badge ' + s.badge + '">' + s.label + '</div>';
+    if (s.nextClass) {
+      html += '<div class="next-bubble">'
+        + '<span class="next-bubble-icon">⏭️</span>'
+        + '<div class="next-bubble-text">'
+        + '<div class="next-bubble-label">Next class</div>'
+        + '<div class="next-bubble-row">'
+        + '<span class="next-bubble-time">' + s.nextClass.time + '</span>'
+        + '<span class="next-bubble-room">' + s.nextClass.room + '</span>'
+        + '</div>'
+        + '<div class="class-bubble-name">' + s.nextClass.name + '</div>'
+        + '</div></div>';
+    } else {
+      html += '<div class="profile-next"><strong>' + (s.nextVal || 'No more today') + '</strong></div>';
+    }
+
+  } else {
+    // ── WEEKEND / DONE ──
+    html += '<div class="profile-badge ' + s.badge + '">' + s.label + '</div>';
+    if (s.nextVal) html += '<div class="profile-next"><strong>' + s.nextVal + '</strong></div>';
+  }
+
+  html += '</div>';
+  return html;
 }
 
-// ─── BUILD TABLE HTML ─────────────────────────────────────────────────────────
-function buildTable(person, dayCode, col) {
-  // 3 header rows + 5 data rows
-  // Header row 1: Day(rowspan3) | Theory Hours AM(colspan5) | None | LUNCH(rowspan3) | Theory Hours PM(colspan5) | None
-  // Header row 2: time labels AM x5 | — | time labels PM x5 | —
-  // Header row 3: Lab Hours AM (colspan2 x3) | Lab Hours PM (colspan2 x3)
+// ─── NEEDLE POSITION ─────────────────────────────────────────────────────────
+// Returns 0..1 fraction of how far through the day's visible timeline we are.
+// Timeline: 8:00 (480) → 19:20 (1160), with lunch gap 13:00-14:00 excluded.
+// Total active minutes = (780-480) + (1160-840) = 300 + 320 = 620 mins
+// We map current time to a pixel position across the table.
+//
+// The table has 13 data columns + 1 day-label column.
+// We need to find the LEFT edge pixel of the current position.
+// Strategy: measure the column positions at runtime via getBoundingClientRect.
+// We store needle position as a percentage of the table container width.
+// This is computed in updateNeedles() at runtime.
 
-  // Header row 1: Theory Hours spans cols 0-4 (5 cols), then "None" col 5,
-  //               then LUNCH (rowspan3), then Theory Hours cols 7-11 (5 cols), then "None" col 12.
+// Non-overlapping, contiguous column time boundaries for needle positioning.
+// Each column owns an exclusive slice of the day's timeline so the needle
+// maps cleanly to exactly one column at any given time.
+// Boundaries chosen using theory-slot starts as dividers; lab-only cols
+// (c5, c12) get the remaining sliver before lunch / end-of-day.
+//
+// col:  0    1    2    3    4    5   6(L)   7    8    9   10   11   12
+var NEEDLE_COL_START = [480, 540, 591, 660, 700, 770, 780, 840, 900,  951, 1020, 1060, 1131];
+var NEEDLE_COL_END   = [540, 591, 660, 700, 770, 780, 840, 900, 951, 1020, 1060, 1131, 1160];
+
+// ─── BUILD TABLE ──────────────────────────────────────────────────────────────
+function buildTable(person, day, mins) {
+  var displayCol = currentDisplayCol(mins);
+
   var h1 = '<tr>'
     + '<th class="hdr-main" rowspan="3" style="min-width:42px">Day</th>'
     + '<th class="hdr-main hdr-am" colspan="5">Theory Hours</th>'
@@ -461,19 +810,15 @@ function buildTable(person, dayCode, col) {
     + '<th class="hdr-main hdr-none" rowspan="2">None</th>'
     + '</tr>';
 
-  // Header row 2: individual time labels for cols 0-4 and 7-11
-  var amLabels = ['8AM–8:50AM','9AM–9:50AM','10AM–10:50AM','11AM–11:50AM','12PM–12:50PM'];
-  var pmLabels = ['2PM–2:50PM','3PM–3:50PM','4PM–4:50PM','5PM–5:50PM','6PM–6:50PM'];
   var h2 = '<tr>';
-  amLabels.forEach(function(t){ h2 += '<th class="hdr-sub hdr-am">' + t + '</th>'; });
-  // col 5 "None" already spanned by rowspan=2 above
-  pmLabels.forEach(function(t){ h2 += '<th class="hdr-sub hdr-pm">' + t + '</th>'; });
-  // col 12 "None" already spanned by rowspan=2 above
+  ['8AM–8:50AM','9AM–9:50AM','10AM–10:50AM','11AM–11:50AM','12PM–12:50PM'].forEach(function(t){
+    h2 += '<th class="hdr-sub hdr-am">' + t + '</th>';
+  });
+  ['2PM–2:50PM','3PM–3:50PM','4PM–4:50PM','5PM–5:50PM','6PM–6:50PM'].forEach(function(t){
+    h2 += '<th class="hdr-sub hdr-pm">' + t + '</th>';
+  });
   h2 += '</tr>';
 
-  // Header row 3: Lab Hours. Each lab block is 2 cols wide.
-  // AM: cols 0+1 = 8AM-9:40, cols 2+3 = 9:51-11:30, cols 4+5 = 11:40-1:20
-  // PM: cols 7+8 = 2PM-3:40, cols 9+10 = 3:51-5:30, cols 11+12 = 5:40-7:20
   var h3 = '<tr>'
     + '<th class="hdr-sub hdr-am" colspan="2">8AM to 9:40AM</th>'
     + '<th class="hdr-sub hdr-am" colspan="2">9:51AM to 11:30AM</th>'
@@ -485,42 +830,43 @@ function buildTable(person, dayCode, col) {
 
   var rows = '';
   for (var di = 0; di < DAYS.length; di++) {
-    var day    = DAYS[di];
-    var isToday = (day === dayCode);
-    var reg    = person.registered[day];
+    var d = DAYS[di];
+    var isToday = (d === day);
+    var reg = person.registered[d];
 
     rows += '<tr>';
-    rows += '<td class="row-label' + (isToday ? ' today' : '') + '">' + day + '</td>';
+    rows += '<td class="row-label' + (isToday ? ' today' : '') + '">' + d + '</td>';
 
     for (var c = 0; c < 13; c++) {
-      // LUNCH column
-      if (c === COL_LUNCH) {
-        rows += '<td class="lunch-cell">LUNCH</td>';
-        continue;
-      }
+      if (c === COL_LUNCH) { rows += '<td class="lunch-cell">LUNCH</td>'; continue; }
 
-      var isCur = isToday && (c === col);
-      var curCls = '';
-      if (isCur) {
-        curCls = hasRegistered(person, day, c) ? ' cur-class' : ' cur-free';
-      }
+      var isCur = isToday && (c === displayCol);
+      var ts = THEORY_SLOT[d][c];
+      var ls = LAB_SLOT[d][c];
 
-      var ts   = THEORY_SLOT[day][c];
-      var ls   = LAB_SLOT[day][c];
-      var hasTh = ts && reg.theory[ts] ? true : false;
-      var hasLb = ls && reg.lab[ls]    ? true : false;
+      var thVal  = ts ? reg.theory[ts] : null;
+      var lbVal  = ls ? reg.lab[ls]    : null;
+      var hasTh  = thVal ? true : false;
+      var hasLb  = lbVal ? true : false;
+      var inClass = isCur && (hasTh || hasLb);
+      var curCls  = isCur ? (inClass ? ' cur-class' : ' cur-free') : '';
 
       if (hasTh && hasLb) {
         rows += '<td class="slot slot-both' + curCls + '">'
-          + '<span class="t-part">' + ts + '</span>'
-          + '/<span class="l-part">' + ls + '</span>'
+          + '<span class="t-part">' + ts + '</span>/<span class="l-part">' + ls + '</span>'
+          + '<span class="course-tag">' + (thVal.n || lbVal.n) + '</span>'
           + '</td>';
       } else if (hasTh) {
-        rows += '<td class="slot slot-th' + curCls + '">' + ts + '</td>';
+        rows += '<td class="slot slot-th' + curCls + '">'
+          + ts
+          + '<span class="course-tag">' + thVal.n + '</span>'
+          + '</td>';
       } else if (hasLb) {
-        rows += '<td class="slot slot-lab' + curCls + '">' + ls + '</td>';
+        rows += '<td class="slot slot-lab' + curCls + '">'
+          + ls
+          + '<span class="course-tag">' + lbVal.n + '</span>'
+          + '</td>';
       } else {
-        // Free slot — show slot codes greyed
         var label = (ts && ls) ? (ts + '/' + ls) : (ts || ls || '—');
         rows += '<td class="slot' + curCls + '">' + label + '</td>';
       }
@@ -528,55 +874,121 @@ function buildTable(person, dayCode, col) {
     rows += '</tr>';
   }
 
-  return '<table class="ffcs"><thead>' + h1 + h2 + h3 + '</thead><tbody>' + rows + '</tbody></table>';
-}
-
-// ─── BUILD TIMETABLE BLOCK ────────────────────────────────────────────────────
-function buildTTBlock(person, dayCode, col) {
-  var s = statusOf(person, dayCode, col);
-  return '<div class="tt-block" style="--accent:' + person.accent + '">'
-    + '<div class="tt-header">'
-    + '<span class="tt-header-emoji">' + person.emoji + '</span>'
-    + '<span class="tt-header-name">'  + person.name  + '</span>'
-    + '<span class="profile-badge ' + s.badge + '">' + s.label + '</span>'
-    + '</div>'
-    + '<div class="tt-wrap">' + buildTable(person, dayCode, col) + '</div>'
+  var tableHTML = '<table class="ffcs" id="tbl-' + person.name + '"><thead>' + h1 + h2 + h3 + '</thead><tbody>' + rows + '</tbody></table>';
+  return '<div class="table-container" id="tc-' + person.name + '">'
+    + tableHTML
+    + '<div class="time-needle" id="needle-' + person.name + '" style="display:none"></div>'
     + '</div>';
 }
 
-// ─── MAIN LOOP ────────────────────────────────────────────────────────────────
-function renderAll() {
+// ─── BUILD TIMETABLE BLOCK ────────────────────────────────────────────────────
+function buildTTBlock(person, day, mins) {
+  var s = statusOf(person, day, mins);
+  return '<div class="tt-block" style="--accent:' + person.accent + '">'
+    + '<div class="tt-header">'
+    + '<span class="tt-header-emoji">' + person.emoji + '</span>'
+    + '<span class="tt-header-name">' + person.name + '</span>'
+    + '<span class="profile-badge ' + s.badge + '">' + s.label + '</span>'
+    + '</div>'
+    + '<div class="tt-wrap">' + buildTable(person, day, mins) + '</div>'
+    + '</div>';
+}
+
+// ─── NEEDLE POSITIONING ───────────────────────────────────────────────────────
+function updateNeedles() {
   var now  = new Date();
   var mins = now.getHours() * 60 + now.getMinutes();
-  var col  = currentCol(mins);
-  var day  = todayCode();
+  var secs = now.getSeconds();
+  // fractional minutes including seconds
+  var minsF = mins + secs / 60;
+  var day   = todayCode();
 
-  // Clock
+  // Only show needle on weekdays during class hours
+  var active = DAYS.indexOf(day) !== -1 && minsF >= 480 && minsF < 1160 && !(minsF >= 780 && minsF < 840);
+
+  for (var i = 0; i < PEOPLE.length; i++) {
+    var needle = document.getElementById('needle-' + PEOPLE[i].name);
+    var tc     = document.getElementById('tc-' + PEOPLE[i].name);
+    var tbl    = document.getElementById('tbl-' + PEOPLE[i].name);
+    if (!needle || !tc || !tbl) continue;
+
+    if (!active) { needle.style.display = 'none'; continue; }
+
+    // Find which column the current time belongs to
+    var targetCol = -1;
+    for (var c = 0; c < 13; c++) {
+      if (c === COL_LUNCH) continue;
+      if (minsF >= NEEDLE_COL_START[c] && minsF < NEEDLE_COL_END[c]) { targetCol = c; break; }
+    }
+    if (targetCol === -1) { needle.style.display = 'none'; continue; }
+
+    // Get real pixel positions from DOM — works correctly even when scrolled
+    var tbody = tbl.querySelector('tbody');
+    if (!tbody) { needle.style.display = 'none'; continue; }
+    var firstRow = tbody.querySelector('tr');
+    if (!firstRow) { needle.style.display = 'none'; continue; }
+    var cells = firstRow.querySelectorAll('td');
+    // cells[0] = day label, cells[1]=col0 ... cells[6]=col5, cells[7]=LUNCH, cells[8]=col7 ...
+    // cellIdx = targetCol + 1  (works for all cols since lunch is col 6 → cells[7])
+    var cellIdx = targetCol + 1;
+    if (cellIdx >= cells.length) { needle.style.display = 'none'; continue; }
+
+    var cell     = cells[cellIdx];
+    var tcRect   = tc.getBoundingClientRect();
+    var cellRect = cell.getBoundingClientRect();
+
+    // How far through this column's exclusive time slice are we?
+    var colSpan  = NEEDLE_COL_END[targetCol] - NEEDLE_COL_START[targetCol];
+    var fraction = Math.max(0, Math.min(1, (minsF - NEEDLE_COL_START[targetCol]) / colSpan));
+
+    // Pixel position of needle relative to table-container's left edge
+    var cellLeft  = cellRect.left  - tcRect.left;
+    var cellWidth = cellRect.width;
+    var needleX   = cellLeft + fraction * cellWidth;
+
+    needle.style.display = 'block';
+    needle.style.left    = needleX + 'px';
+  }
+}
+
+// ─── MAIN LOOP ────────────────────────────────────────────────────────────────
+var lastDay  = '';
+var lastMins = -1;
+
+function tick() {
+  var now   = new Date();
+  var mins  = now.getHours() * 60 + now.getMinutes();
+  var day   = todayCode();
+
+  // Clock — every second
   document.getElementById('clock').textContent =
     String(now.getHours()).padStart(2,'0')   + ':' +
     String(now.getMinutes()).padStart(2,'0') + ':' +
     String(now.getSeconds()).padStart(2,'0');
 
-  document.getElementById('date').textContent =
-    now.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  // Rebuild cards/tables only when minute changes (or first load)
+  if (day !== lastDay || mins !== lastMins) {
+    lastDay  = day;
+    lastMins = mins;
 
-  // Profiles
-  var profilesHTML = '';
-  for (var i = 0; i < PEOPLE.length; i++) {
-    profilesHTML += buildProfileCard(PEOPLE[i], day, col);
-  }
-  document.getElementById('profiles-grid').innerHTML = profilesHTML;
+    document.getElementById('date').textContent =
+      now.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  // Timetables
-  var ttHTML = '';
-  for (var j = 0; j < PEOPLE.length; j++) {
-    ttHTML += buildTTBlock(PEOPLE[j], day, col);
+    var ph = '';
+    for (var i = 0; i < PEOPLE.length; i++) ph += buildProfileCard(PEOPLE[i], day, mins);
+    document.getElementById('profiles-grid').innerHTML = ph;
+
+    var th = '';
+    for (var j = 0; j < PEOPLE.length; j++) th += buildTTBlock(PEOPLE[j], day, mins);
+    document.getElementById('timetables-section').innerHTML = th;
   }
-  document.getElementById('timetables-section').innerHTML = ttHTML;
+
+  // Needle — every second (uses real DOM positions)
+  updateNeedles();
 }
 
-renderAll();
-setInterval(renderAll, 1000);
+tick();
+setInterval(tick, 1000);
 </script>
 </body>
 </html>
