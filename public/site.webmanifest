@@ -1,0 +1,14 @@
+{
+  "name": "Squad Timetable",
+  "short_name": "Squad TT",
+  "description": "Live VIT FFCS class tracker for the squad.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#020308",
+  "theme_color": "#020308",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

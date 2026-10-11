@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Squad Timetable: the Bifröst. Light streaks fall in a column, bend at the
+       horizon and fan out across the floor; gilded rim. Tuned to stay legible at 16px. -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="62%" r="70%">
+      <stop offset="0" stop-color="#16316b"/><stop offset=".55" stop-color="#050913"/><stop offset="1" stop-color="#020308"/>
+    </radialGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".4" stop-color="#fff" stop-opacity="1"/>
+    </linearGradient>
+    <mask id="m"><rect width="64" height="64" fill="url(#fade)"/></mask>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#7cc4ff" stop-opacity=".8"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="tile"><rect width="64" height="64" rx="14"/></clipPath>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="64" height="64" fill="url(#bg)"/>
+    <ellipse cx="32" cy="41" rx="22" ry="10" fill="url(#glow)"/>
+    <g fill="none" stroke-linecap="butt" mask="url(#m)">
+      <path d="M19 0V31Q19 42 -2 66" stroke="#fbbf24" stroke-width="4.5"/>
+      <path d="M25.5 0V33Q25.5 44 14 66" stroke="#3b82f6" stroke-width="4.5"/>
+      <path d="M32 0V66" stroke="#eef6ff" stroke-width="4.5"/>
+      <path d="M38.5 0V33Q38.5 44 50 66" stroke="#3b82f6" stroke-width="4.5"/>
+      <path d="M45 0V31Q45 42 66 66" stroke="#fbbf24" stroke-width="4.5"/>
+    </g>
+  </g>
+  <rect x="1.25" y="1.25" width="61.5" height="61.5" rx="12.75" fill="none" stroke="#fbbf24" stroke-opacity=".6" stroke-width="2.5"/>
+</svg>
