@@ -1,4 +1,5 @@
 import { MjolnirIcon } from './Icons';
+import BifrostRunner from './BifrostRunner';
 import { useState } from 'react';
 import { DAYS, DAY_START, DAY_END, LUNCH_START, LUNCH_END, courseCode } from '../lib/ffcs';
 
@@ -45,6 +46,7 @@ export function SquadPulse({ statuses, day, mins }) {
 
   return (
     <section className="mx-auto mb-5 max-w-3xl bifrost-box rounded-2xl p-4 sm:p-5">
+      <BifrostRunner />
       <div className="flex flex-col items-center gap-3 text-center">
         <div className="flex items-center justify-center gap-3">
           <span className="relative flex h-3 w-3 shrink-0">
@@ -156,6 +158,7 @@ export function ProfileCard({ person, status, editMode, onEdit }) {
       className="bifrost-box hoverable min-w-0 rounded-2xl p-4 pb-3 text-center hover:-translate-y-1"
       style={{ '--acc': person.accent, '--d': `-${runnerOffset(person.id || person.name)}s` }}
     >
+      <BifrostRunner />
       {editMode && (
         <button
           type="button"

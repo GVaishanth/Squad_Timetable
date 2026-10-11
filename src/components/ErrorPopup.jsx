@@ -14,7 +14,7 @@ export function ErrorPopup({ message, onClose }) {
   if (!message) return null;
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="alertdialog" aria-modal="true">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div className="modal-pop relative w-full max-w-sm rounded-2xl border border-red-400/30 bg-slate-900 p-5 text-center shadow-2xl">
         <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15 ring-1 ring-red-400/30">
           <RuneIcon name="warning" tone="red" className="h-6 w-6" />

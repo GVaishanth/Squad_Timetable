@@ -2,7 +2,6 @@
 // The engine + English language data are self-hosted under /ocr/ (see
 // scripts/setup-ocr-assets.mjs), so imports work fully offline. If local
 // assets are missing, we fall back to the default CDN paths.
-import { createWorker } from 'tesseract.js';
 
 const OCR_BASE = `${import.meta.env.BASE_URL}ocr`;
 
@@ -30,6 +29,7 @@ async function createWithFallback(onProgress) {
     localOptions('tesseract-core-lstm.wasm.js'), // plain wasm fallback
     {}, // CDN defaults (needs internet)
   ];
+  const { createWorker } = await import('tesseract.js'); // lazy: keeps it out of the main bundle
   let lastError = null;
   for (const options of attempts) {
     try {

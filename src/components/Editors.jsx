@@ -29,11 +29,11 @@ export function useEscape(onClose) {
 export function ModalShell({ title, subtitle, onClose, children, footer, wide }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/75" onClick={onClose} />
       <div
         className={`modal-pop relative max-h-[92vh] w-full overflow-y-auto rounded-t-2xl bifrost-panel shadow-2xl shadow-blue-950/50 sm:rounded-2xl ${wide ? 'max-w-2xl' : 'max-w-lg'}`}
       >
-        <div className="sticky top-0 border-b border-slate-400/15 bg-slate-900/95 px-5 pb-3 pt-4 backdrop-blur">
+        <div className="sticky top-0 border-b border-slate-400/15 bg-slate-900/95 px-5 pb-3 pt-4">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className="font-display text-lg font-bold tracking-wide text-ivory-50">{title}</h2>

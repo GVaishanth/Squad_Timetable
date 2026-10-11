@@ -1,8 +1,12 @@
 // Bifröst background: a column of light streaks falling from the sky that
 // bends at a horizon and fans out across the floor towards the viewer, with
 // pulses of light racing along the streaks. Rendered on a fixed canvas behind
-// the whole app. Static layer is drawn once per resize; only the pulses animate.
+// the whole app.
+// Performance: the streaks are painted ONCE (per resize) onto a static canvas.
+// Only the light pulses animate, on a second transparent canvas at 1× pixel
+// ratio, capped at 30 fps, paused when the tab is hidden or in Lite mode.
 import { useEffect, useRef } from 'react';
+import { getFx, onFxChange } from '../fx';
 
 // Palette sampled from the reference: mostly blues, some cyan/ice, warm amber
 // threads, and the odd near-white core.
@@ -42,7 +46,7 @@ function mulberry32(seed) {
   };
 }
 
-const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const rgba = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
 
 // Build streak geometry for a W×H viewport.
 function buildStreaks(W, H) {
@@ -194,58 +198,63 @@ function newPulse(geo, rand, scatter) {
     d: scatter ? rand() * s.total : -rand() * 400,
     speed,
     len: 50 + rand() * 160,
-    a: 0.45 + rand() * 0.55,
+    tip: rgba(
+      s.color.map((v) => (255 + v) / 2),
+      0.45 + rand() * 0.55,
+    ),
   };
 }
 
 export default function BifrostBackground() {
-  const canvasRef = useRef(null);
+  const staticRef = useRef(null);
+  const pulseRef = useRef(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return undefined;
+    const base = staticRef.current;
+    const canvas = pulseRef.current;
+    if (!base || !canvas) return undefined;
+    const bctx = base.getContext('2d');
     const ctx = canvas.getContext('2d');
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const rand = Math.random;
+    const FRAME_MS = 1000 / 30;
 
     let W = 0;
     let H = 0;
-    let dpr = 1;
     let geo = null;
-    let staticLayer = null;
     let pulses = [];
     let raf = 0;
     let last = 0;
+    let lastDraw = 0;
     let resizeTimer = 0;
+    const animated = () => getFx() !== 'lite' && !document.hidden;
 
     const setup = () => {
       W = window.innerWidth;
       H = window.innerHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(W * dpr);
-      canvas.height = Math.round(H * dpr);
+      // Static streak layer: crisp (up to 2×), drawn once.
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      base.width = Math.round(W * dpr);
+      base.height = Math.round(H * dpr);
+      bctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       geo = buildStreaks(W, H);
-      staticLayer = document.createElement('canvas');
-      staticLayer.width = canvas.width;
-      staticLayer.height = canvas.height;
-      const sctx = staticLayer.getContext('2d');
-      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      drawStatic(sctx, W, H, geo);
-      const n = Math.round(Math.min(70, Math.max(26, W / 22)));
+      drawStatic(bctx, W, H, geo);
+      // Pulse layer: soft glows don't need retina resolution.
+      canvas.width = W;
+      canvas.height = H;
+      ctx.lineCap = 'round';
+      const n = Math.round(Math.min(40, Math.max(16, W / 34)));
       pulses = Array.from({ length: n }, () => newPulse(geo, rand, true));
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.drawImage(staticLayer, 0, 0);
     };
 
     const frame = (t) => {
-      const dt = last ? Math.min(0.05, (t - last) / 1000) : 0;
+      raf = requestAnimationFrame(frame);
+      if (t - lastDraw < FRAME_MS - 2) return;
+      lastDraw = t;
+      const dt = last ? Math.min(0.08, (t - last) / 1000) : 0;
       last = t;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalCompositeOperation = 'source-over';
-      ctx.drawImage(staticLayer, 0, 0);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'lighter';
-      ctx.lineCap = 'round';
       for (let i = 0; i < pulses.length; i++) {
         const p = pulses[i];
         p.d += p.speed * dt;
@@ -253,12 +262,13 @@ export default function BifrostBackground() {
           pulses[i] = newPulse(geo, rand, false);
           continue;
         }
+        if (p.d <= 0) continue;
         const head = pointAt(p.s, p.d);
         const tail = pointAt(p.s, p.d - p.len);
         const mid = pointAt(p.s, p.d - p.len / 2);
         const g = ctx.createLinearGradient(tail[0], tail[1], head[0], head[1]);
         g.addColorStop(0, rgba(p.s.color, 0));
-        g.addColorStop(1, rgba([255, 255, 255].map((v, k) => (v + p.s.color[k]) / 2), p.a));
+        g.addColorStop(1, p.tip);
         ctx.strokeStyle = g;
         ctx.lineWidth = p.s.width + 0.9;
         ctx.beginPath();
@@ -266,18 +276,24 @@ export default function BifrostBackground() {
         ctx.quadraticCurveTo(mid[0], mid[1], head[0], head[1]);
         ctx.stroke();
       }
-      ctx.globalCompositeOperation = 'source-over';
-      raf = requestAnimationFrame(frame);
     };
 
     const start = () => {
-      if (reduceMotion || raf) return;
+      if (raf || !animated()) return;
       last = 0;
+      lastDraw = 0;
       raf = requestAnimationFrame(frame);
     };
     const stop = () => {
       cancelAnimationFrame(raf);
       raf = 0;
+    };
+    const sync = () => {
+      if (animated()) start();
+      else {
+        stop();
+        if (getFx() === 'lite') ctx.clearRect(0, 0, W, H);
+      }
     };
     const onResize = () => {
       clearTimeout(resizeTimer);
@@ -286,26 +302,25 @@ export default function BifrostBackground() {
         setup();
       }, 150);
     };
-    const onVisibility = () => (document.hidden ? stop() : start());
 
     setup();
-    start();
+    sync();
+    const offFx = onFxChange(sync);
     window.addEventListener('resize', onResize);
-    document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('visibilitychange', sync);
     return () => {
       stop();
+      offFx();
       clearTimeout(resizeTimer);
       window.removeEventListener('resize', onResize);
-      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('visibilitychange', sync);
     };
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 h-full w-full"
-      style={{ zIndex: -1 }}
-    />
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0" style={{ zIndex: -1 }}>
+      <canvas ref={staticRef} className="absolute inset-0 h-full w-full" />
+      <canvas ref={pulseRef} className="absolute inset-0 h-full w-full" />
+    </div>
   );
 }

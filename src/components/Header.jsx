@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { MjolnirIcon, RuneIcon } from './Icons';
+import BifrostRunner from './BifrostRunner';
+import { setFx, useFx } from '../fx';
 
 function pad(n) {
   return String(n).padStart(2, '0');
@@ -26,6 +28,7 @@ export default function Header({
   const fileRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [notice, setNotice] = useState('');
+  const fx = useFx();
 
   const flash = (msg) => {
     setNotice(msg);
@@ -81,7 +84,7 @@ export default function Header({
               <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
               <div
                 role="menu"
-                className="absolute right-0 z-40 mt-2 w-52 overflow-hidden rounded-xl border border-slate-400/20 bg-slate-900/95 shadow-2xl shadow-black/50 backdrop-blur"
+                className="absolute right-0 z-40 mt-2 w-52 overflow-hidden rounded-xl border border-slate-400/20 bg-slate-900/95 shadow-2xl shadow-black/50"
               >
                 <button
                   type="button"
@@ -104,6 +107,27 @@ export default function Header({
                 >
                   <RuneIcon name="import" tone="gold" className="h-4 w-4" />
                   Import backup
+                </button>
+                <button
+                  type="button"
+                  role="menuitemcheckbox"
+                  aria-checked={fx === 'lite'}
+                  onClick={() => {
+                    const next = fx === 'lite' ? 'full' : 'lite';
+                    setFx(next);
+                    flash(next === 'lite' ? 'Lite mode on — animations paused ✓' : 'Full effects on ✓');
+                  }}
+                  className="flex w-full items-center gap-2.5 border-t border-slate-400/10 px-4 py-2.5 text-left text-sm text-ivory-200 transition hover:bg-slate-700/60"
+                >
+                  <RuneIcon name="bolt" tone="gold" className="h-4 w-4" />
+                  <span className="flex-1">Lite mode</span>
+                  <span
+                    className={`relative h-4 w-7 rounded-full transition ${fx === 'lite' ? 'bg-amber-400' : 'bg-slate-600'}`}
+                  >
+                    <span
+                      className={`absolute top-0.5 h-3 w-3 rounded-full bg-slate-950 transition-all ${fx === 'lite' ? 'left-[14px]' : 'left-0.5'}`}
+                    />
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -147,6 +171,7 @@ export default function Header({
 
         {/* Clock (centred) */}
         <div className="bifrost-box min-w-[260px] rounded-2xl px-6 py-2.5 text-center">
+          <BifrostRunner />
           <div className="font-display text-3xl font-bold text-amber-200 [text-shadow:0_0_14px_rgba(251,191,36,0.35)]">
             <ClockDigits text={`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`} />
           </div>
@@ -180,7 +205,7 @@ export default function Header({
 
       {/* Toast */}
       {notice && (
-        <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full border border-slate-400/25 bg-slate-900/95 px-5 py-2.5 text-sm font-semibold text-ivory-100 shadow-2xl backdrop-blur">
+        <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-full border border-slate-400/25 bg-slate-900/95 px-5 py-2.5 text-sm font-semibold text-ivory-100 shadow-2xl">
           {notice}
         </div>
       )}

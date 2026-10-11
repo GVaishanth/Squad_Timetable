@@ -6,6 +6,7 @@ import { CellEditorModal, PersonModal } from './components/Editors';
 import ImportTimetable from './components/ImportTimetable';
 import BifrostBackground from './components/BifrostBackground';
 import { MjolnirIcon, RuneIcon } from './components/Icons';
+import BifrostRunner from './components/BifrostRunner';
 import { useNow, usePeople } from './hooks';
 import { LAB_SLOT, THEORY_SLOT, nowMins, statusOf, todayCode } from './lib/ffcs';
 
@@ -99,6 +100,7 @@ export default function App() {
             key={person.id}
             className="bifrost-box slow overflow-hidden rounded-2xl"
           >
+            <BifrostRunner />
             <div
               className="grid grid-cols-[1fr_auto_1fr] items-center gap-2.5 border-b border-slate-400/15 bg-white/[0.02] px-4 py-3"
               style={{ borderLeft: `5px solid ${person.accent}` }}

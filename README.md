@@ -32,6 +32,12 @@ Hit the **Edit** button (top-left, gold Mjölnir) — no code needed:
 - Everything **saves automatically** to the browser (localStorage) and applies instantly
 - **⋯ menu → Export/Import** to back up or share timetables as JSON, **Reset** to restore the original data
 
+### ⚡ Lightweight by design
+- The Bifröst background paints its streaks once; only the light pulses animate (30 fps, paused when the tab is hidden)
+- Border beams are GPU-rotated layers — no per-frame repaints — and pause when scrolled off-screen
+- **Lite mode** (⋯ menu) freezes all animations while keeping the look. It switches on automatically on low-power devices, with Data Saver / reduced motion, or if the page detects a low frame rate
+- The OCR engine is only downloaded when you actually import a timetable photo
+
 ### 📷 Import timetable from image (new!)
 Adding a member? Hit **Upload timetable image** inside ➕ Add member:
 
@@ -86,6 +92,7 @@ Every push to `main` redeploys. The URL base path is set automatically from the 
 │   ├── App.jsx                 # Layout + modal/editor state
 │   ├── index.css               # Tailwind + needle/scrollbar/modal styles
 │   ├── hooks.js                # useNow clock + usePeople persisted store
+│   ├── fx.js                   # Full / Lite effects mode (auto-detect + toggle)
 │   ├── lib/ffcs.js             # FFCS time model + status engine (pure logic)
 │   ├── lib/ocr.js              # On-device OCR wrapper (tesseract.js, self-hosted)
 │   ├── lib/parseTimetable.js   # OCR/pasted text → timetable rows
@@ -98,7 +105,8 @@ Every push to `main` redeploys. The URL base path is set automatically from the 
 │       ├── ImportTimetable.jsx # Photo/text → review → new member wizard
 │       ├── ErrorPopup.jsx      # Friendly error dialogs
 │       ├── Icons.jsx           # Asgard icon set (Mjölnir + gold rune icons)
-│       └── BifrostBackground.jsx # Animated Bifröst light-streak canvas
+│       ├── BifrostBackground.jsx # Bifröst light-streak canvas (static + pulse layers)
+│       └── BifrostRunner.jsx   # GPU-rotated beam circling each panel border
 ├── public/                     # Favicons + web manifest (copied as-is)
 ├── scripts/
 │   └── setup-ocr-assets.mjs    # Stages OCR engine + language data (postinstall/prebuild)

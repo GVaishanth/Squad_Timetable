@@ -89,6 +89,8 @@ const RUNES = {
   scroll: { strokes: ['M6 3h8.8L18 6.2V21H6Z', 'M14.6 3v3.4H18', 'M9 11h6', 'M9 14.5h6', 'M9 18h3.8'] },
   // 🖼 image: framed mountains with a diamond sun
   image: { strokes: ['M3 4h18v16H3Z', 'M3.4 17.2l5-5.6 4 4 3-3 5.4 4.8'], fills: ['M16.4 6.3 18 7.9l-1.6 1.6-1.6-1.6Z'] },
+  // ⚡ lite mode
+  bolt: { strokes: ['M13.8 2.5 5.4 13.6h5.9l-1.4 7.9 8.7-11.4h-6Z'] },
   // ⚠ warning
   warning: { strokes: ['M12 3.2 21.6 20H2.4Z', 'M12 9.2v5.4'], fills: ['M12 16.3 13.2 17.5 12 18.7 10.8 17.5Z'] },
 };
